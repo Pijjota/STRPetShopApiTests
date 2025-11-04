@@ -35,25 +35,30 @@ class TestStore:
             assert response_json['complete'] == payload['complete'], "complete заказа не совпадает с ожидаемым"
 
     @allure.title("Получение информации о заказе по ID")
-    def test_get_order_by_id(self):
-        with allure.step("Отправка запроса на получение информации о заказе по ID"):
-            response = requests.get(url=f"{BASE_URL}/store/order/1")
+    def test_get_order_by_id(self, create_order):
+        with allure.step("Получение ID созданного заказа"):
+            order_id = create_order["id"]
 
-        with allure.step("Проверка статуса ответа"):
+        with allure.step("Отправка запроса на получение информации о заказе по ID"):
+            response = requests.get(url=f"{BASE_URL}/store/order/{order_id}")
+
+        with allure.step("Проверка статуса ответа и что id совпадают"):
             assert response.status_code == 200
-            assert response.json()["id"] == 1
+            assert response.json()["id"] == order_id
 
     @allure.title("Удаление заказа по ID")
-    def test_delete_order_by_id(self):
+    def test_delete_order_by_id(self, create_order):
+        with allure.step("Получение ID созданного заказа"):
+            order_id = create_order["id"]
 
         with allure.step("Отправка запроса на удаление заказа по ID"):
-            response = requests.delete(url=f"{BASE_URL}/store/order/1")
+            response = requests.delete(url=f"{BASE_URL}/store/order/{order_id}")
 
         with allure.step("Проверка статуса ответа"):
             assert response.status_code == 200
 
         with allure.step("Отправка запроса на получение информации о заказе по ID"):
-            response = requests.get(url=f"{BASE_URL}/store/order/1")
+            response = requests.get(url=f"{BASE_URL}/store/order/{order_id}")
 
         with allure.step("Проверка статуса ответа"):
             assert response.status_code == 404
